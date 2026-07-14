@@ -1,0 +1,18 @@
+/* Custom Design Tokens for Pragyan IMS */
+:root {
+  --primary-dark: #1e293b !important; /* Deep Slate */
+  --accent-blue: #0f172a !important; /* Dark slate */
+  --highlight-teal: #0ea5e9 !important; /* Sky Blue/Teal */
+  --light-gray: #f8fafc !important; /* Canvas background */
+  --border-color: #e2e8f0 !important; /* Table/card borders */
+}
+
+body {
+  margin: 0;
+  background-color: #f8fafc !important; /* Fallback light gray */
+  font-family:
+    "Segoe UI",
+    -apple-system,
+    sans-serif;
+  color: #334155;
+}
