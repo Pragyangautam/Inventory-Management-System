@@ -3,7 +3,7 @@ import { FaBoxes, FaSignOutAlt } from "react-icons/fa";
 
 function Navbar() {
   const navbarStyle = {
-    backgroundColor: "#1e293b", // Direct slate hex fallback
+    backgroundColor: "#1e293b",
     borderBottom: "1px solid #e2e8f0",
     padding: "12px 24px",
   };
@@ -16,10 +16,10 @@ function Navbar() {
         <span className="fw-bold text-white">Pragyan IMS</span>
       </a>
 
-      {/* Right side user info & logout */}
+      {/* User Info & Logout */}
       <div className="ms-auto d-flex align-items-center">
-        <span className="text-light me-3">
-          Welcome, <strong>User</strong>
+        <span className="text-light me-3 d-none d-sm-inline">
+          Welcome, <strong>Admin</strong>
         </span>
         <button
           className="btn btn-sm text-white d-flex align-items-center"

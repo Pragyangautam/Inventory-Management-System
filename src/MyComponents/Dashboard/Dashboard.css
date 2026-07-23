@@ -1,0 +1,44 @@
+/* Custom Humanized UI Styling for Dashboard */
+
+.dashboard-hero {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);
+}
+
+.pillar-card {
+  border-radius: 14px !important;
+  background-color: #ffffff;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #f1f5f9 !important;
+  cursor: pointer;
+}
+
+/* Subtle elevation and slight lift on hover */
+.pillar-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px -6px rgba(14, 165, 233, 0.15) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Glowing accent on arrow link when card is hovered */
+.pillar-card:hover .launch-link {
+  color: #0ea5e9 !important;
+  gap: 6px;
+}
+
+.launch-link {
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.date-badge {
+  background-color: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  color: #f8fafc;
+}
