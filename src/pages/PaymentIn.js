@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import SearchBar from "../components/common/search/SearchBar";
 import FormModal from "../components/common/modal/FormModal";
 
@@ -9,28 +8,23 @@ import {
   updateData,
   deleteData,
 } from "../services/storage/storageService";
+import { addCashTransaction } from "../services/finance/cashBookService";
+const STORAGE_KEY = "payment_in";
 
-const STORAGE_KEY = "expenses";
-
-function Expenses() {
-  const [expenses, setExpenses] = useState([]);
-
+function PaymentIn() {
+  const [payments, setPayments] = useState([]);
   const [search, setSearch] = useState("");
-
   const [showModal, setShowModal] = useState(false);
-
   const [editing, setEditing] = useState(null);
 
   const [date, setDate] = useState("");
-
-  const [head, setHead] = useState("");
-
-  const [vendor, setVendor] = useState("");
-
+  const [receiptNo, setReceiptNo] = useState("");
+  const [customer, setCustomer] = useState("");
+  const [invoiceNo, setInvoiceNo] = useState("");
+  const [method, setMethod] = useState("Cash");
+  const [bank, setBank] = useState("");
+  const [reference, setReference] = useState("");
   const [amount, setAmount] = useState("");
-
-  const [paymentMethod, setPaymentMethod] = useState("Cash");
-
   const [remarks, setRemarks] = useState("");
 
   useEffect(() => {
@@ -38,37 +32,33 @@ function Expenses() {
   }, []);
 
   const load = () => {
-    setExpenses(getData(STORAGE_KEY));
+    setPayments(getData(STORAGE_KEY));
   };
 
   const clear = () => {
     setEditing(null);
 
     setDate("");
-
-    setHead("");
-
-    setVendor("");
-
+    setReceiptNo("");
+    setCustomer("");
+    setInvoiceNo("");
+    setMethod("Cash");
+    setBank("");
+    setReference("");
     setAmount("");
-
-    setPaymentMethod("Cash");
-
     setRemarks("");
   };
 
   const save = () => {
     const obj = {
       date,
-
-      head,
-
-      vendor,
-
+      receiptNo,
+      customer,
+      invoiceNo,
+      method,
+      bank,
+      reference,
       amount: Number(amount),
-
-      paymentMethod,
-
       remarks,
     };
 
@@ -80,8 +70,24 @@ function Expenses() {
       });
     } else {
       addData(STORAGE_KEY, obj);
-    }
 
+      addCashTransaction({
+        date,
+        type: "IN",
+        particulars: "Customer Payment",
+        amount,
+        reference: receiptNo,
+      });
+    }
+    cashIn(
+      date,
+
+      "Customer Payment",
+
+      amount,
+
+      receiptNo,
+    );
     load();
 
     clear();
@@ -93,33 +99,34 @@ function Expenses() {
     setEditing(row);
 
     setDate(row.date);
-
-    setHead(row.head);
-
-    setVendor(row.vendor);
-
+    setReceiptNo(row.receiptNo);
+    setCustomer(row.customer);
+    setInvoiceNo(row.invoiceNo);
+    setMethod(row.method);
+    setBank(row.bank);
+    setReference(row.reference);
     setAmount(row.amount);
-
-    setPaymentMethod(row.paymentMethod);
-
     setRemarks(row.remarks);
 
     setShowModal(true);
   };
 
   const remove = (id) => {
-    if (window.confirm("Delete Expense?")) {
+    if (window.confirm("Delete Payment?")) {
       deleteData(STORAGE_KEY, id);
 
       load();
     }
   };
 
-  const filtered = expenses.filter(
+  const filtered = payments.filter(
     (x) =>
-      x.head.toLowerCase().includes(search.toLowerCase()) ||
-      x.vendor.toLowerCase().includes(search.toLowerCase()),
+      x.customer.toLowerCase().includes(search.toLowerCase()) ||
+      x.receiptNo.toLowerCase().includes(search.toLowerCase()) ||
+      x.invoiceNo.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const totalReceived = filtered.reduce((t, x) => t + Number(x.amount || 0), 0);
 
   return (
     <div>
@@ -127,10 +134,11 @@ function Expenses() {
         style={{
           display: "flex",
           justifyContent: "space-between",
+          alignItems: "center",
           marginBottom: "20px",
         }}
       >
-        <h1>Expenses</h1>
+        <h1>Payment In</h1>
 
         <button
           className="btn btn-primary"
@@ -139,14 +147,14 @@ function Expenses() {
             setShowModal(true);
           }}
         >
-          + Expense
+          + Receive Payment
         </button>
       </div>
 
       <SearchBar
         value={search}
         onChange={setSearch}
-        placeholder="Search Expense..."
+        placeholder="Search Payment..."
       />
 
       <br />
@@ -155,15 +163,12 @@ function Expenses() {
         <thead>
           <tr>
             <th>Date</th>
-
-            <th>Expense Head</th>
-
-            <th>Vendor</th>
-
-            <th>Payment</th>
-
+            <th>Receipt</th>
+            <th>Customer</th>
+            <th>Invoice</th>
+            <th>Method</th>
             <th>Amount</th>
-
+            <th>Reference</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -171,20 +176,24 @@ function Expenses() {
         <tbody>
           {filtered.length === 0 ? (
             <tr>
-              <td colSpan="6">No Expense Found</td>
+              <td colSpan="8">No Payment Received</td>
             </tr>
           ) : (
             filtered.map((item) => (
               <tr key={item.id}>
                 <td>{item.date}</td>
 
-                <td>{item.head}</td>
+                <td>{item.receiptNo}</td>
 
-                <td>{item.vendor}</td>
+                <td>{item.customer}</td>
 
-                <td>{item.paymentMethod}</td>
+                <td>{item.invoiceNo}</td>
+
+                <td>{item.method}</td>
 
                 <td>{item.amount}</td>
+
+                <td>{item.reference}</td>
 
                 <td>
                   <button
@@ -204,11 +213,21 @@ function Expenses() {
             ))
           )}
         </tbody>
+
+        <tfoot>
+          <tr>
+            <th colSpan="5">Total Received</th>
+
+            <th>{totalReceived.toFixed(2)}</th>
+
+            <th colSpan="2"></th>
+          </tr>
+        </tfoot>
       </table>
 
       {showModal && (
         <FormModal
-          title={editing ? "Edit Expense" : "Add Expense"}
+          title={editing ? "Edit Payment" : "Receive Payment"}
           onSave={save}
           onClose={() => setShowModal(false)}
         >
@@ -221,16 +240,48 @@ function Expenses() {
 
           <input
             className="form-control"
-            placeholder="Expense Head"
-            value={head}
-            onChange={(e) => setHead(e.target.value)}
+            placeholder="Receipt No"
+            value={receiptNo}
+            onChange={(e) => setReceiptNo(e.target.value)}
           />
 
           <input
             className="form-control"
-            placeholder="Vendor"
-            value={vendor}
-            onChange={(e) => setVendor(e.target.value)}
+            placeholder="Customer Name"
+            value={customer}
+            onChange={(e) => setCustomer(e.target.value)}
+          />
+
+          <input
+            className="form-control"
+            placeholder="Invoice No"
+            value={invoiceNo}
+            onChange={(e) => setInvoiceNo(e.target.value)}
+          />
+
+          <select
+            className="form-control"
+            value={method}
+            onChange={(e) => setMethod(e.target.value)}
+          >
+            <option>Cash</option>
+            <option>Bank Transfer</option>
+            <option>Cheque</option>
+            <option>QR Payment</option>
+          </select>
+
+          <input
+            className="form-control"
+            placeholder="Bank (Optional)"
+            value={bank}
+            onChange={(e) => setBank(e.target.value)}
+          />
+
+          <input
+            className="form-control"
+            placeholder="Reference / Cheque No"
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
           />
 
           <input
@@ -240,17 +291,6 @@ function Expenses() {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
-
-          <select
-            className="form-control"
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-          >
-            <option>Cash</option>
-            <option>Bank</option>
-            <option>QR</option>
-            <option>Cheque</option>
-          </select>
 
           <textarea
             className="form-control"
@@ -265,4 +305,4 @@ function Expenses() {
   );
 }
 
-export default Expenses;
+export default PaymentIn;

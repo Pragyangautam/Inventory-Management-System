@@ -1,19 +1,25 @@
-import React from "react";
-
 function SalesTable({ sales, onEdit, onDelete }) {
   return (
-    <table className="table">
+    <table className="data-table">
       <thead>
         <tr>
-          <th>Invoice No</th>
-          <th>Customer</th>
-          <th>Product</th>
-          <th>Quantity</th>
-          <th>Price</th>
-          <th>Total</th>
-          <th>Payment Status</th>
+          <th>SN</th>
+
+          <th>Invoice</th>
+
           <th>Date</th>
-          <th>Actions</th>
+
+          <th>Customer</th>
+
+          <th>Product</th>
+
+          <th>Qty</th>
+
+          <th>Rate</th>
+
+          <th>Total</th>
+
+          <th width="170">Action</th>
         </tr>
       </thead>
 
@@ -23,33 +29,33 @@ function SalesTable({ sales, onEdit, onDelete }) {
             <td colSpan="9">No Sales Found</td>
           </tr>
         ) : (
-          sales.map((sale) => (
+          sales.map((sale, index) => (
             <tr key={sale.id}>
+              <td>{index + 1}</td>
+
               <td>{sale.invoiceNo}</td>
+
+              <td>{sale.invoiceDate}</td>
 
               <td>{sale.customer}</td>
 
               <td>{sale.product}</td>
 
-              <td>{sale.quantity}</td>
+              <td>{sale.qty}</td>
 
-              <td>${sale.price}</td>
+              <td>{sale.rate}</td>
 
-              <td>${sale.total}</td>
-
-              <td>
-                <span>{sale.paymentStatus}</span>
-              </td>
-
-              <td>{sale.date}</td>
+              <td>{sale.grandTotal}</td>
 
               <td>
-                <button className="btn btn-edit" onClick={() => onEdit(sale)}>
-                  Edit
-                </button>
-
                 <button
-                  className="btn btn-delete"
+                  className="btn btn-primary"
+                  onClick={() => onEdit(sale)}
+                >
+                  Edit
+                </button>{" "}
+                <button
+                  className="btn btn-danger"
                   onClick={() => onDelete(sale.id)}
                 >
                   Delete
